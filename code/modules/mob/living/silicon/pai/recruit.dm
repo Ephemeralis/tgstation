@@ -42,6 +42,14 @@ var/datum/paiController/paiController			// Global handler for pAI candidates
 			ticker.mode.update_rev_icons_removed(card.pai.mind)
 
 			pai_candidates -= candidate
+
+			if (availableRecruitsCount() == 0)
+				for(var/obj/item/device/paicard/p in world)
+					if (p.looking_for_personality == 1)
+						p.overlays.Cut()
+						p.overlays += "pai-off"
+
+
 			usr << browse(null, "window=findPai")
 
 	if(href_list["new"])
@@ -186,6 +194,16 @@ var/datum/paiController/paiController			// Global handler for pAI candidates
 	dat += "</table>"
 
 	user << browse(dat, "window=findPai")
+
+/datum/paiController/proc/availableRecruitsCount()
+	var/cancount = 0
+	for(var/datum/paiCandidate/c in paiController.pai_candidates)
+		for(var/mob/dead/observer/o in player_list)
+			if (o.key == c.key)
+				cancount += 1
+
+	return cancount
+
 
 /datum/paiController/proc/requestRecruits()
 	for(var/mob/dead/observer/O in player_list)
